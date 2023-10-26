@@ -1,3 +1,4 @@
+using learn.Data;
 using learn.Models.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,27 +9,17 @@ namespace learn.Controllers
     [ApiController]
     public class RegionsController : ControllerBase
     {
+        private readonly DefaultDbContext dbContext;
+
+        public RegionsController(DefaultDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
         [HttpGet]
         public IActionResult GetAll()
         {
-            var regions = new List<Region>
-            {
-                new Region
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Auckland Region",
-                    Code = "AKL",
-                    RegionImageUrl = "https://picsum.photos/200/300"
-                },
-                new Region
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Wellington Region",
-                    Code = "WLG",
-                    RegionImageUrl = "https://picsum.photos/200/300"
-                }
-            };
-
+            var regions = dbContext.Regions.ToList();
             return Ok(regions);
         }
     }
