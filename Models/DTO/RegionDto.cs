@@ -1,6 +1,6 @@
-namespace learn.Models.Domain
+namespace learn.Models.DTO
 {
-    public class Region
+    public class RegionDto
     {
         public Guid Id { get; set; }
         public string Code { get; set; }

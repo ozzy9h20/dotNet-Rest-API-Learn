@@ -1,5 +1,6 @@
 using learn.Data;
 using learn.Models.Domain;
+using learn.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,26 +17,59 @@ namespace learn.Controllers
             this.dbContext = dbContext;
         }
 
+        // GET ALL REGIONS
+        // GET: https://localhost:7027/api/Regions
         [HttpGet]
         public IActionResult GetAll()
         {
-            var regions = dbContext.Regions.ToList();
+            // Get Data From Database - Domain Models
+            var regionsDomain = dbContext.Regions.ToList();
 
-            return Ok(regions);
+            // Map Domain Models to DTOs
+            var regionsDto = new List<RegionDto>();
+
+            foreach (var regionDomain in regionsDomain)
+            {
+                regionsDto.Add(
+                    new RegionDto
+                    {
+                        Id = regionDomain.Id,
+                        Code = regionDomain.Code,
+                        Name = regionDomain.Name,
+                        RegionImageUrl = regionDomain.RegionImageUrl
+                    }
+                );
+            }
+
+            // Return DTOs
+            return Ok(regionsDto);
         }
 
+        // GET SINGLE REGION (Get Region By ID)
+        // GET: https://localhost:7027/api/Regions/{id}
         [HttpGet]
         [Route("{id:Guid}")]
         public IActionResult GetById([FromRoute] Guid id)
         {
-            var region = dbContext.Regions.Find(id);
+            // Get Region Domain Model From Database
+            var regionDomain = dbContext.Regions.Find(id);
 
-            if (region == null)
+            if (regionDomain == null)
             {
                 return NotFound();
             }
 
-            return Ok(region);
+            // Map/Convert Region Domain Model to Region DTO
+            var regionDto = new RegionDto
+            {
+                Id = regionDomain.Id,
+                Code = regionDomain.Code,
+                Name = regionDomain.Name,
+                RegionImageUrl = regionDomain.RegionImageUrl
+            };
+
+            // Return DTO Back to client
+            return Ok(regionDto);
         }
     }
 }
