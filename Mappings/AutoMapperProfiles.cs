@@ -13,6 +13,7 @@ namespace learn.Mappings
             CreateMap<Region, UpdateRegionRequestDto>().ReverseMap();
             CreateMap<Walk, AddWalkRequestDto>().ReverseMap();
             CreateMap<Walk, WalkDto>().ReverseMap();
+            CreateMap<Difficulty, DifficultyDto>().ReverseMap();
         }
     }
 }

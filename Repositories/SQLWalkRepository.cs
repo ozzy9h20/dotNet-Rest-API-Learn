@@ -22,7 +22,10 @@ namespace learn.Repositories
 
         public async Task<List<Walk>> GetAllAsync()
         {
-            var walksDomainModel = await dbContext.Walks.ToListAsync();
+            var walksDomainModel = await dbContext.Walks
+                .Include("Difficulty")
+                .Include("Region")
+                .ToListAsync();
             return walksDomainModel;
         }
     }
