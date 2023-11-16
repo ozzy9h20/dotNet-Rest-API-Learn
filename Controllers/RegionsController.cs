@@ -1,10 +1,7 @@
-using learn.Data;
 using learn.Models.Domain;
 using learn.Models.DTO;
 using learn.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace learn.Controllers
 {
@@ -12,12 +9,10 @@ namespace learn.Controllers
     [ApiController]
     public class RegionsController : ControllerBase
     {
-        private readonly DefaultDbContext dbContext;
         private readonly IRegionRepository regionRepository;
 
-        public RegionsController(DefaultDbContext dbContext, IRegionRepository regionRepository)
+        public RegionsController(IRegionRepository regionRepository)
         {
-            this.dbContext = dbContext;
             this.regionRepository = regionRepository;
         }
 
@@ -56,7 +51,7 @@ namespace learn.Controllers
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             // Get Region Domain Model From Database
-            var regionDomain = await dbContext.Regions.FindAsync(id);
+            var regionDomain = await regionRepository.GetByIdAsync(id);
 
             if (regionDomain == null)
             {
@@ -90,8 +85,7 @@ namespace learn.Controllers
             };
 
             // Use Domain Model to Create Region
-            await dbContext.Regions.AddAsync(regionDomainModel);
-            await dbContext.SaveChangesAsync();
+            regionDomainModel = await regionRepository.CreateAsync(regionDomainModel);
 
             // Map Domain Model Back to DTO
             var regionDto = new RegionDto
@@ -114,20 +108,21 @@ namespace learn.Controllers
             [FromBody] UpdateRegionRequestDto updateRegionRequestDto
         )
         {
+            // Map DTO to Domain Model
+            var regionDomainModel = new Region
+            {
+                Name = updateRegionRequestDto.Name,
+                Code = updateRegionRequestDto.Code,
+                RegionImageUrl = updateRegionRequestDto.RegionImageUrl
+            };
+
             // Check if region exists
-            var regionDomainModel = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            regionDomainModel = await regionRepository.UpdateAsync(id, regionDomainModel);
 
             if (regionDomainModel == null)
             {
                 return NotFound();
             }
-
-            // Map DTO to Domain Model
-            regionDomainModel.Code = updateRegionRequestDto.Code;
-            regionDomainModel.Name = updateRegionRequestDto.Name;
-            regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
-
-            await dbContext.SaveChangesAsync();
 
             // Convert Domain Model to DTO
             var regionDto = new RegionDto
@@ -147,16 +142,12 @@ namespace learn.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var regionDomainModel = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            var regionDomainModel = await regionRepository.DeleteAsync(id);
 
             if (regionDomainModel == null)
             {
                 return NotFound();
             }
-
-            // Delete Region
-            dbContext.Regions.Remove(regionDomainModel);
-            await dbContext.SaveChangesAsync();
 
             // Return Deleted Region Back
             // Map Domain Model to DTO
