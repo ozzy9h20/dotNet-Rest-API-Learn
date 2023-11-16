@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using learn.Data;
 using learn.Repositories;
+using learn.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<DefaultDbContext>(
 );
 
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 var app = builder.Build();
 

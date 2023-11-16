@@ -1,3 +1,4 @@
+using AutoMapper;
 using learn.Models.Domain;
 using learn.Models.DTO;
 using learn.Repositories;
@@ -10,10 +11,12 @@ namespace learn.Controllers
     public class RegionsController : ControllerBase
     {
         private readonly IRegionRepository regionRepository;
+        private readonly IMapper mapper;
 
-        public RegionsController(IRegionRepository regionRepository)
+        public RegionsController(IRegionRepository regionRepository, IMapper mapper)
         {
             this.regionRepository = regionRepository;
+            this.mapper = mapper;
         }
 
         // GET ALL REGIONS
@@ -24,24 +27,8 @@ namespace learn.Controllers
             // Get Data From Database - Domain Models
             var regionsDomain = await regionRepository.GetAllAsync();
 
-            // Map Domain Models to DTOs
-            var regionsDto = new List<RegionDto>();
-
-            foreach (var regionDomain in regionsDomain)
-            {
-                regionsDto.Add(
-                    new RegionDto
-                    {
-                        Id = regionDomain.Id,
-                        Code = regionDomain.Code,
-                        Name = regionDomain.Name,
-                        RegionImageUrl = regionDomain.RegionImageUrl
-                    }
-                );
-            }
-
             // Return DTOs
-            return Ok(regionsDto);
+            return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
         }
 
         // GET SINGLE REGION (Get Region By ID)
@@ -58,17 +45,8 @@ namespace learn.Controllers
                 return NotFound();
             }
 
-            // Map/Convert Region Domain Model to Region DTO
-            var regionDto = new RegionDto
-            {
-                Id = regionDomain.Id,
-                Code = regionDomain.Code,
-                Name = regionDomain.Name,
-                RegionImageUrl = regionDomain.RegionImageUrl
-            };
-
             // Return DTO Back to client
-            return Ok(regionDto);
+            return Ok(mapper.Map<RegionDto>(regionDomain));
         }
 
         // POST TO CREATE NEW REGION
@@ -77,24 +55,13 @@ namespace learn.Controllers
         public async Task<ActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
             // Map/Convert DTO to Domain Model
-            var regionDomainModel = new Region
-            {
-                Code = addRegionRequestDto.Code,
-                Name = addRegionRequestDto.Name,
-                RegionImageUrl = addRegionRequestDto.RegionImageUrl
-            };
+            var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
 
             // Use Domain Model to Create Region
             regionDomainModel = await regionRepository.CreateAsync(regionDomainModel);
 
             // Map Domain Model Back to DTO
-            var regionDto = new RegionDto
-            {
-                Id = regionDomainModel.Id,
-                Code = regionDomainModel.Code,
-                Name = regionDomainModel.Name,
-                RegionImageUrl = regionDomainModel.RegionImageUrl
-            };
+            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
 
             return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
         }
@@ -109,12 +76,7 @@ namespace learn.Controllers
         )
         {
             // Map DTO to Domain Model
-            var regionDomainModel = new Region
-            {
-                Name = updateRegionRequestDto.Name,
-                Code = updateRegionRequestDto.Code,
-                RegionImageUrl = updateRegionRequestDto.RegionImageUrl
-            };
+            var regionDomainModel = mapper.Map<Region>(updateRegionRequestDto);
 
             // Check if region exists
             regionDomainModel = await regionRepository.UpdateAsync(id, regionDomainModel);
@@ -124,16 +86,7 @@ namespace learn.Controllers
                 return NotFound();
             }
 
-            // Convert Domain Model to DTO
-            var regionDto = new RegionDto
-            {
-                Id = regionDomainModel.Id,
-                Name = regionDomainModel.Name,
-                Code = regionDomainModel.Code,
-                RegionImageUrl = regionDomainModel.RegionImageUrl,
-            };
-
-            return Ok(regionDto);
+            return Ok(mapper.Map<RegionDto>(regionDomainModel));
         }
 
         // DELETE REGION
@@ -150,16 +103,7 @@ namespace learn.Controllers
             }
 
             // Return Deleted Region Back
-            // Map Domain Model to DTO
-            var regionDto = new RegionDto
-            {
-                Id = regionDomainModel.Id,
-                Name = regionDomainModel.Name,
-                Code = regionDomainModel.Code,
-                RegionImageUrl = regionDomainModel.RegionImageUrl,
-            };
-
-            return Ok(regionDto);
+            return Ok(mapper.Map<RegionDto>(regionDomainModel));
         }
     }
 }
