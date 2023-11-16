@@ -11,5 +11,7 @@ namespace learn.Repositories
         Task<Walk?> GetByIdAsync(Guid id);
 
         Task<Walk?> UpdateAsync(Guid id, Walk walk);
+
+        Task<Walk?> DeleteAsync(Guid id);
     }
 }

@@ -57,5 +57,20 @@ namespace learn.Repositories
 
             return existingWalk;
         }
+
+        public async Task<Walk?> DeleteAsync(Guid id)
+        {
+            var existingWalk = await GetByIdAsync(id);
+
+            if (existingWalk == null)
+            {
+                return null;
+            }
+
+            dbContext.Walks.Remove(existingWalk);
+            await dbContext.SaveChangesAsync();
+
+            return existingWalk;
+        }
     }
 }
