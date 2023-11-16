@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using learn.Data;
+using learn.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DefaultDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase"))
 );
+
+builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 
 var app = builder.Build();
 
