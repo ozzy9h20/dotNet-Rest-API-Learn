@@ -36,5 +36,26 @@ namespace learn.Repositories
                 .Include("Region")
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<Walk?> UpdateAsync(Guid id, Walk walk)
+        {
+            var existingWalk = await GetByIdAsync(id);
+
+            if (existingWalk == null)
+            {
+                return null;
+            }
+
+            existingWalk.Name = walk.Name;
+            existingWalk.Description = walk.Description;
+            existingWalk.LengthInKm = walk.LengthInKm;
+            existingWalk.WalkImageUrl = walk.WalkImageUrl;
+            existingWalk.RegionId = walk.RegionId;
+            existingWalk.DifficultyId = walk.DifficultyId;
+
+            await dbContext.SaveChangesAsync();
+
+            return existingWalk;
+        }
     }
 }
