@@ -27,5 +27,12 @@ namespace learn.Controllers
 
             return Ok(mapper.Map<WalkDto>(createdWalk));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var walksDomainModel = await walkRepository.GetAllAsync();
+            return Ok(mapper.Map<List<WalkDto>>(walksDomainModel));
+        }
     }
 }

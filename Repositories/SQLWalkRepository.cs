@@ -1,5 +1,6 @@
 using learn.Data;
 using learn.Models.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace learn.Repositories
 {
@@ -17,6 +18,12 @@ namespace learn.Repositories
             await dbContext.Walks.AddAsync(walk);
             await dbContext.SaveChangesAsync();
             return walk;
+        }
+
+        public async Task<List<Walk>> GetAllAsync()
+        {
+            var walksDomainModel = await dbContext.Walks.ToListAsync();
+            return walksDomainModel;
         }
     }
 }
