@@ -3,6 +3,7 @@ using learn.Models.Domain;
 using learn.Models.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace learn.Controllers
 {
@@ -20,10 +21,10 @@ namespace learn.Controllers
         // GET ALL REGIONS
         // GET: https://localhost:7027/api/Regions
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
             // Get Data From Database - Domain Models
-            var regionsDomain = dbContext.Regions.ToList();
+            var regionsDomain = await dbContext.Regions.ToListAsync();
 
             // Map Domain Models to DTOs
             var regionsDto = new List<RegionDto>();
@@ -49,10 +50,10 @@ namespace learn.Controllers
         // GET: https://localhost:7027/api/Regions/{id}
         [HttpGet]
         [Route("{id:Guid}")]
-        public IActionResult GetById([FromRoute] Guid id)
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             // Get Region Domain Model From Database
-            var regionDomain = dbContext.Regions.Find(id);
+            var regionDomain = await dbContext.Regions.FindAsync(id);
 
             if (regionDomain == null)
             {
@@ -75,7 +76,7 @@ namespace learn.Controllers
         // POST TO CREATE NEW REGION
         // POST: https://localhost:7027/api/Regions
         [HttpPost]
-        public IActionResult Create([FromBody] AddRegionRequestDto addRegionRequestDto)
+        public async Task<ActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
             // Map/Convert DTO to Domain Model
             var regionDomainModel = new Region
@@ -86,8 +87,8 @@ namespace learn.Controllers
             };
 
             // Use Domain Model to Create Region
-            dbContext.Regions.Add(regionDomainModel);
-            dbContext.SaveChanges();
+            await dbContext.Regions.AddAsync(regionDomainModel);
+            await dbContext.SaveChangesAsync();
 
             // Map Domain Model Back to DTO
             var regionDto = new RegionDto
@@ -105,13 +106,13 @@ namespace learn.Controllers
         // PUT: https://localhost:7027/api/Regions/{id}
         [HttpPut]
         [Route("{id:Guid}")]
-        public IActionResult Update(
+        public async Task<IActionResult> Update(
             [FromRoute] Guid id,
             [FromBody] UpdateRegionRequestDto updateRegionRequestDto
         )
         {
             // Check if region exists
-            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+            var regionDomainModel = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
 
             if (regionDomainModel == null)
             {
@@ -123,7 +124,7 @@ namespace learn.Controllers
             regionDomainModel.Name = updateRegionRequestDto.Name;
             regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             // Convert Domain Model to DTO
             var regionDto = new RegionDto
@@ -141,9 +142,9 @@ namespace learn.Controllers
         // Delete: https://localhost:7027/api/Regions/{id}
         [HttpDelete]
         [Route("{id:Guid}")]
-        public IActionResult Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+            var regionDomainModel = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
 
             if (regionDomainModel == null)
             {
@@ -152,7 +153,7 @@ namespace learn.Controllers
 
             // Delete Region
             dbContext.Regions.Remove(regionDomainModel);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             // Return Deleted Region Back
             // Map Domain Model to DTO
