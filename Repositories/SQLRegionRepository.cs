@@ -24,7 +24,9 @@ namespace learn.Repositories
             string? filterOn = null,
             string? filterQuery = null,
             string? sortBy = null,
-            bool isAscending = true
+            bool isAscending = true,
+            int pageNumber = 1,
+            int pageSize = 1000
         )
         {
             var regions = dbContext.Regions.AsQueryable();
@@ -56,7 +58,8 @@ namespace learn.Repositories
                 }
             }
 
-            return await regions.ToListAsync();
+            var skipResults = (pageNumber - 1) * pageSize;
+            return await regions.Skip(skipResults).Take(pageSize).ToListAsync();
         }
 
         public async Task<Region?> GetByIdAsync(Guid id)

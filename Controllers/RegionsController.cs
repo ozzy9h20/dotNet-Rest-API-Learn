@@ -24,10 +24,12 @@ namespace learn.Controllers
         // GET: https://localhost:7027/api/Regions
         [HttpGet]
         public async Task<IActionResult> GetAll(
-            [FromQuery] string? filterOn,
-            [FromQuery] string? filterQuery,
-            [FromQuery] string? sortBy,
-            [FromQuery] bool? isAscending
+            [FromQuery] string? filterOn = null,
+            [FromQuery] string? filterQuery = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] bool? isAscending = true,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 1000
         )
         {
             // Get Data From Database - Domain Models
@@ -35,7 +37,9 @@ namespace learn.Controllers
                 filterOn,
                 filterQuery,
                 sortBy,
-                isAscending ?? true
+                isAscending ?? true,
+                pageNumber,
+                pageSize
             );
 
             // Return DTOs
