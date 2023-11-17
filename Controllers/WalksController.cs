@@ -1,5 +1,5 @@
-using System.Security.Cryptography;
 using AutoMapper;
+using learn.CustomActionFilters;
 using learn.Models.Domain;
 using learn.Models.DTO;
 using learn.Repositories;
@@ -21,17 +21,13 @@ namespace learn.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddWalkRequestDto addWalkRequestDto)
         {
-            if (ModelState.IsValid)
-            {
-                var walkDomainModel = mapper.Map<Walk>(addWalkRequestDto);
-                var createdWalk = await walkRepository.CreateAsync(walkDomainModel);
+            var walkDomainModel = mapper.Map<Walk>(addWalkRequestDto);
+            var createdWalk = await walkRepository.CreateAsync(walkDomainModel);
 
-                return Ok(mapper.Map<WalkDto>(createdWalk));
-            }
-
-            return BadRequest(ModelState);
+            return Ok(mapper.Map<WalkDto>(createdWalk));
         }
 
         [HttpGet]
@@ -57,26 +53,22 @@ namespace learn.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
         public async Task<IActionResult> Update(
             [FromRoute] Guid id,
             [FromBody] UpdateWalkRequestDto updateWalkRequestDto
         )
         {
-            if (ModelState.IsValid)
+            var walkDomainModel = mapper.Map<Walk>(updateWalkRequestDto);
+
+            walkDomainModel = await walkRepository.UpdateAsync(id, walkDomainModel);
+
+            if (walkDomainModel == null)
             {
-                var walkDomainModel = mapper.Map<Walk>(updateWalkRequestDto);
-
-                walkDomainModel = await walkRepository.UpdateAsync(id, walkDomainModel);
-
-                if (walkDomainModel == null)
-                {
-                    return NotFound();
-                }
-
-                return Ok(mapper.Map<WalkDto>(walkDomainModel));
+                return NotFound();
             }
 
-            return BadRequest(ModelState);
+            return Ok(mapper.Map<WalkDto>(walkDomainModel));
         }
 
         [HttpDelete]
