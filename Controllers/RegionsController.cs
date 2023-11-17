@@ -25,11 +25,18 @@ namespace learn.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? filterOn,
-            [FromQuery] string? filterQuery
+            [FromQuery] string? filterQuery,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? isAscending
         )
         {
             // Get Data From Database - Domain Models
-            var regionsDomain = await regionRepository.GetAllAsync(filterOn, filterQuery);
+            var regionsDomain = await regionRepository.GetAllAsync(
+                filterOn,
+                filterQuery,
+                sortBy,
+                isAscending ?? true
+            );
 
             // Return DTOs
             return Ok(mapper.Map<List<RegionDto>>(regionsDomain));

@@ -6,7 +6,12 @@ namespace learn.Repositories
     {
         Task<Region> CreateAsync(Region region);
 
-        Task<List<Region>> GetAllAsync(string? filterOn = null, string? filterQuery = null);
+        Task<List<Region>> GetAllAsync(
+            string? filterOn = null,
+            string? filterQuery = null,
+            string? sortBy = null,
+            bool isAscending = true
+        );
 
         Task<Region?> GetByIdAsync(Guid id);
 

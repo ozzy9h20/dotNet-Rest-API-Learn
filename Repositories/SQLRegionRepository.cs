@@ -20,7 +20,12 @@ namespace learn.Repositories
             return region;
         }
 
-        public async Task<List<Region>> GetAllAsync(string? filterOn, string? filterQuery)
+        public async Task<List<Region>> GetAllAsync(
+            string? filterOn = null,
+            string? filterQuery = null,
+            string? sortBy = null,
+            bool isAscending = true
+        )
         {
             var regions = dbContext.Regions.AsQueryable();
 
@@ -32,6 +37,22 @@ namespace learn.Repositories
                 if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
                 {
                     regions = regions.Where(x => x.Name.Contains(filterQuery));
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    regions = isAscending
+                        ? regions.OrderBy(x => x.Name)
+                        : regions.OrderByDescending(x => x.Name);
+                }
+                else if (sortBy.Equals("Code", StringComparison.OrdinalIgnoreCase))
+                {
+                    regions = isAscending
+                        ? regions.OrderBy(x => x.Code)
+                        : regions.OrderByDescending(x => x.Code);
                 }
             }
 
