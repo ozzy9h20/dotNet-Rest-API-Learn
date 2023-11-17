@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using AutoMapper;
 using learn.Models.Domain;
 using learn.Models.DTO;
@@ -22,10 +23,15 @@ namespace learn.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddWalkRequestDto addWalkRequestDto)
         {
-            var walkDomainModel = mapper.Map<Walk>(addWalkRequestDto);
-            var createdWalk = await walkRepository.CreateAsync(walkDomainModel);
+            if (ModelState.IsValid)
+            {
+                var walkDomainModel = mapper.Map<Walk>(addWalkRequestDto);
+                var createdWalk = await walkRepository.CreateAsync(walkDomainModel);
 
-            return Ok(mapper.Map<WalkDto>(createdWalk));
+                return Ok(mapper.Map<WalkDto>(createdWalk));
+            }
+
+            return BadRequest(ModelState);
         }
 
         [HttpGet]
@@ -56,16 +62,21 @@ namespace learn.Controllers
             [FromBody] UpdateWalkRequestDto updateWalkRequestDto
         )
         {
-            var walkDomainModel = mapper.Map<Walk>(updateWalkRequestDto);
-
-            walkDomainModel = await walkRepository.UpdateAsync(id, walkDomainModel);
-
-            if (walkDomainModel == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                var walkDomainModel = mapper.Map<Walk>(updateWalkRequestDto);
+
+                walkDomainModel = await walkRepository.UpdateAsync(id, walkDomainModel);
+
+                if (walkDomainModel == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(mapper.Map<WalkDto>(walkDomainModel));
             }
 
-            return Ok(mapper.Map<WalkDto>(walkDomainModel));
+            return BadRequest(ModelState);
         }
 
         [HttpDelete]
