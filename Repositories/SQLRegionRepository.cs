@@ -20,9 +20,22 @@ namespace learn.Repositories
             return region;
         }
 
-        public async Task<List<Region>> GetAllAsync()
+        public async Task<List<Region>> GetAllAsync(string? filterOn, string? filterQuery)
         {
-            return await dbContext.Regions.ToListAsync();
+            var regions = dbContext.Regions.AsQueryable();
+
+            if (
+                string.IsNullOrWhiteSpace(filterOn) == false
+                && string.IsNullOrWhiteSpace(filterQuery) == false
+            )
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    regions = regions.Where(x => x.Name.Contains(filterQuery));
+                }
+            }
+
+            return await regions.ToListAsync();
         }
 
         public async Task<Region?> GetByIdAsync(Guid id)

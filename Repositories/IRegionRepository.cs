@@ -6,7 +6,7 @@ namespace learn.Repositories
     {
         Task<Region> CreateAsync(Region region);
 
-        Task<List<Region>> GetAllAsync();
+        Task<List<Region>> GetAllAsync(string? filterOn = null, string? filterQuery = null);
 
         Task<Region?> GetByIdAsync(Guid id);
 

@@ -20,13 +20,25 @@ namespace learn.Repositories
             return walk;
         }
 
-        public async Task<List<Walk>> GetAllAsync()
+        public async Task<List<Walk>> GetAllAsync(
+            string? filterOn = null,
+            string? filterQuery = null
+        )
         {
-            var walksDomainModel = await dbContext.Walks
-                .Include("Difficulty")
-                .Include("Region")
-                .ToListAsync();
-            return walksDomainModel;
+            var walks = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+
+            if (
+                string.IsNullOrWhiteSpace(filterOn) == false
+                && string.IsNullOrWhiteSpace(filterQuery) == false
+            )
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.Where(x => x.Name.Contains(filterQuery));
+                }
+            }
+
+            return await walks.ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)

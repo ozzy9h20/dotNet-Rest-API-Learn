@@ -23,10 +23,13 @@ namespace learn.Controllers
         // GET ALL REGIONS
         // GET: https://localhost:7027/api/Regions
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? filterOn,
+            [FromQuery] string? filterQuery
+        )
         {
             // Get Data From Database - Domain Models
-            var regionsDomain = await regionRepository.GetAllAsync();
+            var regionsDomain = await regionRepository.GetAllAsync(filterOn, filterQuery);
 
             // Return DTOs
             return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
