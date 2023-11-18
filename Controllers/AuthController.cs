@@ -1,4 +1,5 @@
 using learn.Models.DTO;
+using learn.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,15 @@ namespace learn.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<IdentityUser> userManager;
+        private readonly ITokenRepository tokenRepository;
 
-        public AuthController(UserManager<IdentityUser> userManager)
+        public AuthController(
+            UserManager<IdentityUser> userManager,
+            ITokenRepository tokenRepository
+        )
         {
             this.userManager = userManager;
+            this.tokenRepository = tokenRepository;
         }
 
         [HttpPost]
@@ -63,7 +69,18 @@ namespace learn.Controllers
 
                 if (checkPasswordResult)
                 {
-                    return Ok();
+                    // Get Roles for This User
+                    var roles = await userManager.GetRolesAsync(user);
+
+                    if (roles != null)
+                    {
+                        // Create Token
+                        var jwtToken = tokenRepository.CreateJWTToken(user, roles.ToList());
+
+                        var response = new LoginReponseDto { JwtToken = jwtToken };
+
+                        return Ok(response);
+                    }
                 }
             }
 
