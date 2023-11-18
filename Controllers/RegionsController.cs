@@ -3,12 +3,14 @@ using learn.CustomActionFilters;
 using learn.Models.Domain;
 using learn.Models.DTO;
 using learn.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace learn.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly IRegionRepository regionRepository;

@@ -5,7 +5,7 @@ namespace learn.Data
 {
     public class DefaultDbContext : DbContext
     {
-        public DefaultDbContext(DbContextOptions dbContextOptions)
+        public DefaultDbContext(DbContextOptions<DefaultDbContext> dbContextOptions)
             : base(dbContextOptions) { }
 
         public DbSet<Difficulty> Difficulties { get; set; }
