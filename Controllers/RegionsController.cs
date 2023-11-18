@@ -10,7 +10,6 @@ namespace learn.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly IRegionRepository regionRepository;
@@ -25,6 +24,7 @@ namespace learn.Controllers
         // GET ALL REGIONS
         // GET: https://localhost:7027/api/Regions
         [HttpGet]
+        [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? filterOn = null,
             [FromQuery] string? filterQuery = null,
@@ -52,6 +52,7 @@ namespace learn.Controllers
         // GET: https://localhost:7027/api/Regions/{id}
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             // Get Region Domain Model From Database
@@ -70,6 +71,7 @@ namespace learn.Controllers
         // POST: https://localhost:7027/api/Regions
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<ActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
             // Map/Convert DTO to Domain Model
@@ -89,6 +91,7 @@ namespace learn.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Update(
             [FromRoute] Guid id,
             [FromBody] UpdateRegionRequestDto updateRegionRequestDto
@@ -112,6 +115,7 @@ namespace learn.Controllers
         // Delete: https://localhost:7027/api/Regions/{id}
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var regionDomainModel = await regionRepository.DeleteAsync(id);
