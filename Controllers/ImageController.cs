@@ -1,4 +1,6 @@
+using learn.Models.Domain;
 using learn.Models.DTO;
+using learn.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace learn.Controllers
@@ -7,13 +9,35 @@ namespace learn.Controllers
     [ApiController]
     public class ImageController : ControllerBase
     {
+        private readonly IImageRepository imageRepository;
+
+        public ImageController(IImageRepository imageRepository)
+        {
+            this.imageRepository = imageRepository;
+        }
+
         [HttpPost]
         [Route("Upload")]
         public async Task<IActionResult> Upload([FromForm] ImageUploadRequestDto request)
         {
             ValidateFileUpload(request);
 
-            if (ModelState.IsValid) { }
+            if (ModelState.IsValid)
+            {
+                // Convert DTO to Domain Model
+                var imageDomainModel = new Image
+                {
+                    File = request.File,
+                    FileName = request.FileName,
+                    FileExtension = Path.GetExtension(request.File.FileName),
+                    FileSizeInBytes = request.File.Length,
+                    FileDescription = request.FileDescription
+                };
+
+                await imageRepository.Upload(imageDomainModel);
+
+                return Ok(imageDomainModel);
+            }
 
             return BadRequest(ModelState);
         }
