@@ -41,31 +41,22 @@ namespace learn.Controllers
             [FromQuery] int pageSize = 1000
         )
         {
-            try
-            {
-                throw new Exception("This is a custom exception");
-                // Get Data From Database - Domain Models
-                var regionsDomain = await regionRepository.GetAllAsync(
-                    filterOn,
-                    filterQuery,
-                    sortBy,
-                    isAscending ?? true,
-                    pageNumber,
-                    pageSize
-                );
+            // Get Data From Database - Domain Models
+            var regionsDomain = await regionRepository.GetAllAsync(
+                filterOn,
+                filterQuery,
+                sortBy,
+                isAscending ?? true,
+                pageNumber,
+                pageSize
+            );
 
-                logger.LogInformation(
-                    $"Finished GetAllRegions request with data: {JsonSerializer.Serialize(regionsDomain)}"
-                );
+            logger.LogInformation(
+                $"Finished GetAllRegions request with data: {JsonSerializer.Serialize(regionsDomain)}"
+            );
 
-                // Return DTOs
-                return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                throw;
-            }
+            // Return DTOs
+            return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
         }
 
         // GET SINGLE REGION (Get Region By ID)
