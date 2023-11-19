@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using AutoMapper;
 using learn.CustomActionFilters;
 using learn.Models.Domain;
@@ -7,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace learn.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion(1.0)]
     [ApiController]
     public class WalksController : ControllerBase
     {
@@ -20,7 +22,7 @@ namespace learn.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost]
+        [HttpPost, MapToApiVersion(1.0)]
         [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddWalkRequestDto addWalkRequestDto)
         {
@@ -30,7 +32,7 @@ namespace learn.Controllers
             return Ok(mapper.Map<WalkDto>(createdWalk));
         }
 
-        [HttpGet]
+        [HttpGet, MapToApiVersion(1.0)]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? filterOn,
             [FromQuery] string? filterQuery,
@@ -52,7 +54,7 @@ namespace learn.Controllers
             return Ok(mapper.Map<List<WalkDto>>(walksDomainModel));
         }
 
-        [HttpGet]
+        [HttpGet, MapToApiVersion(1.0)]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
@@ -66,7 +68,7 @@ namespace learn.Controllers
             return Ok(mapper.Map<WalkDto>(walkDomainModel));
         }
 
-        [HttpPut]
+        [HttpPut, MapToApiVersion(1.0)]
         [Route("{id:Guid}")]
         [ValidateModel]
         public async Task<IActionResult> Update(
@@ -86,7 +88,7 @@ namespace learn.Controllers
             return Ok(mapper.Map<WalkDto>(walkDomainModel));
         }
 
-        [HttpDelete]
+        [HttpDelete, MapToApiVersion(1.0)]
         [Route("{id:Guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {

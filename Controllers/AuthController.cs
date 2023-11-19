@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using learn.Models.DTO;
 using learn.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -5,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace learn.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion(1.0)]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -21,7 +23,7 @@ namespace learn.Controllers
             this.tokenRepository = tokenRepository;
         }
 
-        [HttpPost]
+        [HttpPost, MapToApiVersion(1.0)]
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
@@ -54,7 +56,7 @@ namespace learn.Controllers
             return BadRequest("Something went wrong");
         }
 
-        [HttpPost]
+        [HttpPost, MapToApiVersion(1.0)]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {

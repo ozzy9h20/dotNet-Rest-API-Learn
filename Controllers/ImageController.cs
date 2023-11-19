@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using learn.Models.Domain;
 using learn.Models.DTO;
 using learn.Repositories;
@@ -5,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace learn.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion(1.0)]
     [ApiController]
     public class ImageController : ControllerBase
     {
@@ -16,7 +18,7 @@ namespace learn.Controllers
             this.imageRepository = imageRepository;
         }
 
-        [HttpPost]
+        [HttpPost, MapToApiVersion(1.0)]
         [Route("Upload")]
         public async Task<IActionResult> Upload([FromForm] ImageUploadRequestDto request)
         {

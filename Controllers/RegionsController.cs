@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Asp.Versioning;
 using AutoMapper;
 using learn.CustomActionFilters;
 using learn.Models.Domain;
@@ -9,7 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace learn.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion(1.0)]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class RegionsController : ControllerBase
     {
@@ -29,8 +31,8 @@ namespace learn.Controllers
         }
 
         // GET ALL REGIONS
-        // GET: https://localhost:7027/api/Regions
-        [HttpGet]
+        // GET: https://localhost:7027/api/Regions/
+        [HttpGet, MapToApiVersion(1.0)]
         [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? filterOn = null,
@@ -61,7 +63,7 @@ namespace learn.Controllers
 
         // GET SINGLE REGION (Get Region By ID)
         // GET: https://localhost:7027/api/Regions/{id}
-        [HttpGet]
+        [HttpGet, MapToApiVersion(1.0)]
         [Route("{id:Guid}")]
         [Authorize(Roles = "Writer,Reader")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
@@ -80,7 +82,7 @@ namespace learn.Controllers
 
         // POST TO CREATE NEW REGION
         // POST: https://localhost:7027/api/Regions
-        [HttpPost]
+        [HttpPost, MapToApiVersion(1.0)]
         [ValidateModel]
         [Authorize(Roles = "Writer")]
         public async Task<ActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
@@ -99,7 +101,7 @@ namespace learn.Controllers
 
         // UPDATE REGION
         // PUT: https://localhost:7027/api/Regions/{id}
-        [HttpPut]
+        [HttpPut, MapToApiVersion(1.0)]
         [Route("{id:Guid}")]
         [ValidateModel]
         [Authorize(Roles = "Writer")]
@@ -124,7 +126,7 @@ namespace learn.Controllers
 
         // DELETE REGION
         // Delete: https://localhost:7027/api/Regions/{id}
-        [HttpDelete]
+        [HttpDelete, MapToApiVersion(1.0)]
         [Route("{id:Guid}")]
         [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)

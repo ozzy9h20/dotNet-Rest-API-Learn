@@ -10,6 +10,8 @@ using Microsoft.OpenApi.Models;
 using learn.Middlewares;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
+using Asp.Versioning.ApiExplorer;
+using learn;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +28,25 @@ builder.Logging.AddSerilog(logger);
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services
+    .AddApiVersioning(options =>
+    {
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+        options.ReportApiVersions = true;
+    })
+    .AddMvc()
+    .AddApiExplorer(options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+        options.FormatGroupName = (group, version) => $"{group} - {version}";
+    });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Learn API", Version = "v1" });
     options.AddSecurityDefinition(
         JwtBearerDefaults.AuthenticationScheme,
         new OpenApiSecurityScheme
@@ -111,13 +127,26 @@ builder.Services
             }
     );
 
+builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+
 var app = builder.Build();
+
+var versionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in versionDescriptionProvider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant()
+            );
+        }
+    });
 }
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
