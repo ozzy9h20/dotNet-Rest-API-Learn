@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AutoMapper;
 using learn.CustomActionFilters;
 using learn.Models.Domain;
@@ -14,11 +15,17 @@ namespace learn.Controllers
     {
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
+        private readonly ILogger<RegionsController> logger;
 
-        public RegionsController(IRegionRepository regionRepository, IMapper mapper)
+        public RegionsController(
+            IRegionRepository regionRepository,
+            IMapper mapper,
+            ILogger<RegionsController> logger
+        )
         {
             this.regionRepository = regionRepository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         // GET ALL REGIONS
@@ -34,18 +41,31 @@ namespace learn.Controllers
             [FromQuery] int pageSize = 1000
         )
         {
-            // Get Data From Database - Domain Models
-            var regionsDomain = await regionRepository.GetAllAsync(
-                filterOn,
-                filterQuery,
-                sortBy,
-                isAscending ?? true,
-                pageNumber,
-                pageSize
-            );
+            try
+            {
+                throw new Exception("This is a custom exception");
+                // Get Data From Database - Domain Models
+                var regionsDomain = await regionRepository.GetAllAsync(
+                    filterOn,
+                    filterQuery,
+                    sortBy,
+                    isAscending ?? true,
+                    pageNumber,
+                    pageSize
+                );
 
-            // Return DTOs
-            return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
+                logger.LogInformation(
+                    $"Finished GetAllRegions request with data: {JsonSerializer.Serialize(regionsDomain)}"
+                );
+
+                // Return DTOs
+                return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
 
         // GET SINGLE REGION (Get Region By ID)
